@@ -11,7 +11,8 @@ import {
   Sparkles,
   X,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import gsap from "gsap";
+import { useEffect, useRef, useState } from "react";
 import heroImage from "../assets/studio-ganga-hero.png";
 import courtyardHouse from "../assets/courtyard-house.png";
 import riverRoom from "../assets/river-room.png";
@@ -92,6 +93,10 @@ const materialNotes = ["Lime plaster", "Local stone", "Teak and ash", "Concrete"
 function App() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const introRef = useRef(null);
+  const wordmarkRef = useRef(null);
+  const circleRef = useRef(null);
+  const appRef = useRef(null);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -100,12 +105,122 @@ function App() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  useEffect(() => {
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    if (reduceMotion) {
+      gsap.set(introRef.current, { autoAlpha: 0, pointerEvents: "none" });
+      gsap.set(appRef.current, { autoAlpha: 1 });
+      return undefined;
+    }
+
+    const context = gsap.context(() => {
+      gsap.set(appRef.current, { autoAlpha: 0 });
+      gsap.set(".intro-letter", { yPercent: 115 });
+      gsap.set(circleRef.current, { scale: 0, rotate: -90 });
+      gsap.set(".intro-meta span", { y: 16, autoAlpha: 0 });
+
+      const timeline = gsap.timeline({ defaults: { ease: "power4.out" } });
+
+      timeline
+        .to(".intro-letter", {
+          yPercent: 0,
+          duration: 1.05,
+          stagger: 0.035,
+        })
+        .to(
+          circleRef.current,
+          {
+            scale: 1,
+            rotate: 0,
+            duration: 0.95,
+          },
+          "-=0.65"
+        )
+        .to(
+          ".intro-meta span",
+          {
+            y: 0,
+            autoAlpha: 1,
+            duration: 0.72,
+            stagger: 0.08,
+          },
+          "-=0.45"
+        )
+        .to(wordmarkRef.current, {
+          scale: 0.88,
+          y: -24,
+          duration: 0.9,
+          ease: "power3.inOut",
+        })
+        .to(
+          introRef.current,
+          {
+            clipPath: "inset(0 0 100% 0)",
+            duration: 1.05,
+            ease: "expo.inOut",
+            pointerEvents: "none",
+          },
+          "-=0.22"
+        )
+        .to(
+          appRef.current,
+          {
+            autoAlpha: 1,
+            duration: 0.55,
+          },
+          "-=0.86"
+        )
+        .from(
+          ".hero-copy > *",
+          {
+            y: 36,
+            autoAlpha: 0,
+            duration: 0.9,
+            stagger: 0.12,
+          },
+          "-=0.48"
+        );
+    });
+
+    return () => context.revert();
+  }, []);
+
   return (
     <>
-      <header className={`site-header ${scrolled || menuOpen ? "is-solid" : ""}`}>
+      <section className="intro-loader" ref={introRef} aria-label="Studio Ganga opening animation">
+        <div className="intro-wordmark" ref={wordmarkRef} aria-label="Studio Ganga">
+          <span className="intro-word">
+            {"STUDI".split("").map((letter, index) => (
+              <span className="intro-mask" key={`studio-${letter}-${index}`}>
+                <span className="intro-letter">{letter}</span>
+              </span>
+            ))}
+            <span className="intro-circle-wrap">
+              <span className="intro-circle" ref={circleRef} aria-label="O" />
+            </span>
+          </span>
+          <span className="intro-word">
+            {"GANGA".split("").map((letter, index) => (
+              <span className="intro-mask" key={`ganga-${letter}-${index}`}>
+                <span className="intro-letter">{letter}</span>
+              </span>
+            ))}
+          </span>
+        </div>
+        <div className="intro-meta" aria-hidden="true">
+          <span>Architecture</span>
+          <span>Interiors</span>
+          <span>Place Making</span>
+        </div>
+      </section>
+
+      <div className="app-shell" ref={appRef}>
+        <header className={`site-header ${scrolled || menuOpen ? "is-solid" : ""}`}>
         <a className="brand" href="#top" aria-label="Studio Ganga home" onClick={() => setMenuOpen(false)}>
-          <span className="brand-symbol">SG</span>
-          <span className="brand-text">Studio Ganga</span>
+          <span className="brand-text">
+            Studi<span className="brand-o" aria-hidden="true" /> Ganga
+          </span>
         </a>
 
         <nav className={`nav ${menuOpen ? "is-open" : ""}`} aria-label="Primary navigation">
@@ -129,9 +244,9 @@ function App() {
         >
           {menuOpen ? <X size={22} /> : <Menu size={22} />}
         </button>
-      </header>
+        </header>
 
-      <main id="top">
+        <main id="top">
         <section className="hero">
           <img className="hero-img" src={heroImage} alt="Contemporary architecture with stone, timber, plants, and shaded courtyard light" />
           <div className="hero-overlay" />
@@ -293,13 +408,14 @@ function App() {
             </button>
           </form>
         </section>
-      </main>
+        </main>
 
-      <footer className="footer">
-        <span>Studio Ganga</span>
-        <span>Architecture and interiors</span>
-        <a href="mailto:hello@studioganga.in">hello@studioganga.in</a>
-      </footer>
+        <footer className="footer">
+          <span>Studio Ganga</span>
+          <span>Architecture and interiors</span>
+          <a href="mailto:hello@studioganga.in">hello@studioganga.in</a>
+        </footer>
+      </div>
     </>
   );
 }
