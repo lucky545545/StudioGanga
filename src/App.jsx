@@ -1,8 +1,23 @@
-import { ArrowRight, ArrowUpRight, Building2, Compass, Layers3, Menu, PencilRuler, X } from "lucide-react";
+import {
+  ArrowRight,
+  ArrowUpRight,
+  Building2,
+  CalendarCheck,
+  Compass,
+  Layers3,
+  Menu,
+  PencilRuler,
+  Ruler,
+  Sparkles,
+  X,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import heroImage from "../assets/studio-ganga-hero.png";
+import courtyardHouse from "../assets/courtyard-house.png";
+import riverRoom from "../assets/river-room.png";
+import stoneAtelier from "../assets/stone-atelier.png";
 
-const navItems = ["Work", "Studio", "Services", "Contact"];
+const navItems = ["Work", "Studio", "Process", "Services", "Contact"];
 
 const projects = [
   {
@@ -11,7 +26,7 @@ const projects = [
     place: "Bengaluru outskirts",
     year: "2026",
     summary: "A family home arranged around shade, breeze, verandahs, and a garden room that changes through the day.",
-    crop: "project-one",
+    image: courtyardHouse,
   },
   {
     name: "Stone Atelier",
@@ -19,7 +34,7 @@ const projects = [
     place: "Kochi",
     year: "2025",
     summary: "A studio for samples, client reviews, model making, and slow focused work under filtered light.",
-    crop: "project-two",
+    image: stoneAtelier,
   },
   {
     name: "River Room",
@@ -27,7 +42,7 @@ const projects = [
     place: "Mysuru",
     year: "2025",
     summary: "A compact dining interior using deep reveals, warm plaster, timber rhythm, and intimate evening lighting.",
-    crop: "project-three",
+    image: riverRoom,
   },
 ];
 
@@ -53,6 +68,26 @@ const services = [
     text: "Site review, feasibility, concept direction, material strategy, and design audits.",
   },
 ];
+
+const processSteps = [
+  {
+    icon: Compass,
+    title: "Read the place",
+    text: "We study site, light, privacy, wind, routines, budget, and constraints before the first formal proposal.",
+  },
+  {
+    icon: Ruler,
+    title: "Shape the brief",
+    text: "Plans, mood, material direction, and cost logic are developed together so the design has a practical spine.",
+  },
+  {
+    icon: CalendarCheck,
+    title: "Guide execution",
+    text: "Drawings, vendor coordination, site visits, and refinements carry the idea through to handover.",
+  },
+];
+
+const materialNotes = ["Lime plaster", "Local stone", "Teak and ash", "Concrete", "Metal detailing", "Filtered daylight"];
 
 function App() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -101,11 +136,11 @@ function App() {
           <img className="hero-img" src={heroImage} alt="Contemporary architecture with stone, timber, plants, and shaded courtyard light" />
           <div className="hero-overlay" />
           <div className="hero-copy">
-            <p className="kicker">Architecture / Interiors / Renovation</p>
-            <h1>Designing buildings that breathe with light, climate, and ritual.</h1>
+            <p className="kicker">Climate-aware architecture and interiors</p>
+            <h1>Architecture that feels composed, lived-in, and deeply rooted.</h1>
             <div className="hero-lower">
               <p>
-                Studio Ganga shapes homes, workspaces, and hospitality interiors with a calm material language and obsessive attention to how people actually live.
+                Studio Ganga creates residences, studios, and hospitality spaces where proportion, material, light, and everyday ritual do the quiet work.
               </p>
               <a className="text-button" href="#work">
                 View work <ArrowRight size={18} />
@@ -122,7 +157,7 @@ function App() {
         <section className="statement">
           <p className="kicker">Point of view</p>
           <h2>
-            We do not chase spectacle. We design the pauses: a cool threshold, a shaded stair, a wall that holds afternoon light.
+            We design the pauses: a cool threshold, a shaded stair, a wall that holds afternoon light, a room that makes ordinary life feel considered.
           </h2>
         </section>
 
@@ -135,8 +170,8 @@ function App() {
           <div className="project-list">
             {projects.map((project, index) => (
               <article className="project-row" key={project.name}>
-                <div className={`project-media ${project.crop}`}>
-                  <img src={heroImage} alt="" aria-hidden="true" />
+                <div className="project-media">
+                  <img src={project.image} alt={`${project.name} architecture project`} />
                 </div>
                 <div className="project-number">{String(index + 1).padStart(2, "0")}</div>
                 <div className="project-detail">
@@ -155,7 +190,7 @@ function App() {
 
         <section className="studio" id="studio">
           <div className="studio-image">
-            <img src={heroImage} alt="Warm modern architecture interior used as a studio mood image" />
+            <img src={stoneAtelier} alt="Material studio with stone samples, timber joinery, and daylight" />
           </div>
           <div className="studio-content">
             <p className="kicker">Studio</p>
@@ -163,6 +198,11 @@ function App() {
             <p>
               The studio works through measured drawings, physical samples, climate logic, local craft, and careful site conversations. The result is architecture that feels authored without feeling forced.
             </p>
+            <div className="studio-badges" aria-label="Studio focus areas">
+              {materialNotes.map((note) => (
+                <span key={note}>{note}</span>
+              ))}
+            </div>
             <div className="principles">
               <div>
                 <strong>Material honesty</strong>
@@ -173,6 +213,25 @@ function App() {
                 <span>Light, privacy, wind, access, budget, and construction realities enter early.</span>
               </div>
             </div>
+          </div>
+        </section>
+
+        <section className="process" id="process">
+          <div className="section-title compact">
+            <p className="kicker">Process</p>
+            <h2>Clear enough for construction. Sensitive enough for place.</h2>
+          </div>
+          <div className="process-grid">
+            {processSteps.map(({ icon: Icon, title, text }, index) => (
+              <article className="process-card" key={title}>
+                <div className="process-card-top">
+                  <Icon size={24} strokeWidth={1.6} />
+                  <span>{String(index + 1).padStart(2, "0")}</span>
+                </div>
+                <h3>{title}</h3>
+                <p>{text}</p>
+              </article>
+            ))}
           </div>
         </section>
 
@@ -197,8 +256,12 @@ function App() {
             <p className="kicker">Start a project</p>
             <h2>Bring the plot, the plan, the problem, or the dream.</h2>
             <p>
-              Replace this placeholder contact information with the client’s phone, address, Instagram, and preferred enquiry email before launch.
+              Share a few lines about the site, scope, timeline, and what the space needs to make possible. The studio will respond with the next practical step.
             </p>
+            <div className="contact-strip">
+              <Sparkles size={18} strokeWidth={1.7} />
+              <span>Ideal for homes, boutique hospitality, workspaces, and thoughtful renovations.</span>
+            </div>
           </div>
           <form className="contact-form" action="mailto:hello@studioganga.in" method="post" encType="text/plain">
             <label>
