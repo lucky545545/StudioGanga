@@ -1,422 +1,454 @@
-import {
-  ArrowRight,
-  ArrowUpRight,
-  Building2,
-  CalendarCheck,
-  Compass,
-  Layers3,
-  Menu,
-  PencilRuler,
-  Ruler,
-  Sparkles,
-  X,
-} from "lucide-react";
+import { ArrowUpRight, Mail, Menu, Phone, X } from "lucide-react";
 import gsap from "gsap";
 import { useEffect, useRef, useState } from "react";
-import heroImage from "../assets/studio-ganga-hero.png";
-import courtyardHouse from "../assets/courtyard-house.png";
-import riverRoom from "../assets/river-room.png";
-import stoneAtelier from "../assets/stone-atelier.png";
+import courtyardHouse from "../assets/WhatsApp Image 2026-07-07 at 4.27.48 PM (2).jpeg";
+import riverRoom from "../assets/WhatsApp Image 2026-07-07 at 4.27.48 PM (1).jpeg";
+import stoneAtelier from "../assets/WhatsApp Image 2026-07-07 at 4.27.49 PM.jpeg";
+import heroImage from "../assets/WhatsApp Image 2026-07-07 at 4.27.49 PM (3).jpeg";
+import loaderOne from "../assets/WhatsApp Image 2026-07-07 at 4.27.48 PM.jpeg";
+import loaderTwo from "../assets/WhatsApp Image 2026-07-07 at 4.27.49 PM (1).jpeg";
+import loaderThree from "../assets/WhatsApp Image 2026-07-07 at 4.27.50 PM.jpeg";
 
-const navItems = ["Work", "Studio", "Process", "Services", "Contact"];
+const orbitImages = Object.values(
+  import.meta.glob("../assets2/*.jpg", { eager: true, query: "?url", import: "default" })
+);
+const orbitSequence = [...orbitImages, ...orbitImages.slice(0, 6)];
 
-const projects = [
+const milestones = [
+  ["15+", "Years of experience"],
+  ["490+", "Completed projects"],
+  ["45+", "Professionals on the team"],
+  ["40K", "Total area covered"],
+];
+
+const navItems = ["About", "Services", "Insights", "Projects", "Blog"];
+
+const work = [
   {
-    name: "Courtyard House",
-    type: "Private residence",
-    place: "Bengaluru outskirts",
-    year: "2026",
-    summary: "A family home arranged around shade, breeze, verandahs, and a garden room that changes through the day.",
+    number: "01",
+    title: "Residential Architecture",
+    text: "Homes planned around light, privacy, breeze, family routines, and a calmer everyday rhythm.",
     image: courtyardHouse,
   },
   {
-    name: "Stone Atelier",
-    type: "Creative workspace",
-    place: "Kochi",
-    year: "2025",
-    summary: "A studio for samples, client reviews, model making, and slow focused work under filtered light.",
-    image: stoneAtelier,
-  },
-  {
-    name: "River Room",
-    type: "Hospitality interior",
-    place: "Mysuru",
-    year: "2025",
-    summary: "A compact dining interior using deep reveals, warm plaster, timber rhythm, and intimate evening lighting.",
+    number: "02",
+    title: "Interior Design",
+    text: "Warm, precise interiors with careful material palettes, furniture direction, lighting, and site-ready detailing.",
     image: riverRoom,
   },
-];
-
-const services = [
   {
-    icon: Building2,
-    title: "Architecture",
-    text: "New homes, boutique commercial spaces, additions, and adaptive reuse projects.",
-  },
-  {
-    icon: Layers3,
-    title: "Interiors",
-    text: "Planning, finishes, lighting, furniture, joinery, and construction-ready detailing.",
-  },
-  {
-    icon: PencilRuler,
-    title: "Renovation",
-    text: "Existing-space diagnosis, phased upgrades, site coordination, and careful reuse.",
-  },
-  {
-    icon: Compass,
-    title: "Consultation",
-    text: "Site review, feasibility, concept direction, material strategy, and design audits.",
+    number: "03",
+    title: "Renovation & Adaptive Reuse",
+    text: "Existing spaces reworked with respect for structure, memory, budget, and the way people actually use rooms.",
+    image: stoneAtelier,
   },
 ];
 
-const processSteps = [
-  {
-    icon: Compass,
-    title: "Read the place",
-    text: "We study site, light, privacy, wind, routines, budget, and constraints before the first formal proposal.",
-  },
-  {
-    icon: Ruler,
-    title: "Shape the brief",
-    text: "Plans, mood, material direction, and cost logic are developed together so the design has a practical spine.",
-  },
-  {
-    icon: CalendarCheck,
-    title: "Guide execution",
-    text: "Drawings, vendor coordination, site visits, and refinements carry the idea through to handover.",
-  },
+const strengths = [
+  ["Site First Thinking", "Every proposal begins with sun, wind, access, noise, privacy, and the character of the plot."],
+  ["Material Clarity", "Stone, timber, plaster, metal, and concrete are chosen for age, touch, maintenance, and climate."],
+  ["Measured Detailing", "Drawings and decisions are kept clear enough for site teams to build with confidence."],
+  ["Calm Collaboration", "Clients, craftspeople, and vendors stay aligned through a practical and transparent process."],
+  ["Light & Proportion", "Rooms are shaped so daylight, scale, openings, and thresholds feel intentional."],
+  ["End-to-End Guidance", "From early feasibility to handover, the studio keeps the idea and execution connected."],
 ];
-
-const materialNotes = ["Lime plaster", "Local stone", "Teak and ash", "Concrete", "Metal detailing", "Filtered daylight"];
 
 function App() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
-  const introRef = useRef(null);
-  const wordmarkRef = useRef(null);
-  const circleRef = useRef(null);
-  const appRef = useRef(null);
+  const introTimeline = useRef(null);
+
+  const beginDrag = (event) => {
+    if (event.button !== 0) return;
+    const card = event.currentTarget;
+    const canvas = card.closest(".loader");
+    const cardBox = card.getBoundingClientRect();
+    const canvasBox = canvas.getBoundingClientRect();
+    const offsetX = event.clientX - cardBox.left;
+    const offsetY = event.clientY - cardBox.top;
+    card.setPointerCapture(event.pointerId);
+    card.classList.add("is-dragging");
+
+    const move = (moveEvent) => {
+      const left = Math.max(0, Math.min(canvasBox.width - cardBox.width, moveEvent.clientX - canvasBox.left - offsetX));
+      const top = Math.max(0, Math.min(canvasBox.height - cardBox.height, moveEvent.clientY - canvasBox.top - offsetY));
+      card.style.left = `${left}px`;
+      card.style.top = `${top}px`;
+      card.style.right = "auto";
+    };
+
+    const finish = () => {
+      card.classList.remove("is-dragging");
+      card.removeEventListener("pointermove", move);
+      card.removeEventListener("pointerup", finish);
+      card.removeEventListener("pointercancel", finish);
+    };
+
+    card.addEventListener("pointermove", move);
+    card.addEventListener("pointerup", finish);
+    card.addEventListener("pointercancel", finish);
+  };
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 24);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  useEffect(() => {
-    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reducedMotion) return undefined;
 
-    if (reduceMotion) {
-      gsap.set(introRef.current, { autoAlpha: 0, pointerEvents: "none" });
-      gsap.set(appRef.current, { autoAlpha: 1 });
-      return undefined;
-    }
+    const scrollState = { y: window.scrollY };
+    const syncIntroToScroll = () => {
+      const progress = Math.min(1, Math.max(0, window.scrollY / window.innerHeight));
+      gsap.set(".loader", { yPercent: -100 * progress });
+    };
+    window.addEventListener("scroll", syncIntroToScroll, { passive: true });
+    syncIntroToScroll();
 
     const context = gsap.context(() => {
-      gsap.set(appRef.current, { autoAlpha: 0 });
-      gsap.set(".intro-letter", { yPercent: 115 });
-      gsap.set(circleRef.current, { scale: 0, rotate: -90 });
-      gsap.set(".intro-meta span", { y: 16, autoAlpha: 0 });
-
-      const timeline = gsap.timeline({ defaults: { ease: "power4.out" } });
-
-      timeline
-        .to(".intro-letter", {
-          yPercent: 0,
-          duration: 1.05,
-          stagger: 0.035,
+      const intro = gsap.timeline({
+        defaults: { ease: "power3.inOut" },
+      });
+      introTimeline.current = intro;
+      intro
+        .from(".loader-card", {
+          x: (index) => [180, -210, 150][index],
+          y: (index) => [-130, 160, -180][index],
+          scale: 0.48,
+          rotation: (index) => [24, -28, 18][index],
+          autoAlpha: 0,
+          duration: 1.35,
+          stagger: 0.22,
+          ease: "power3.out",
         })
-        .to(
-          circleRef.current,
-          {
-            scale: 1,
-            rotate: 0,
-            duration: 0.95,
-          },
-          "-=0.65"
-        )
-        .to(
-          ".intro-meta span",
-          {
-            y: 0,
-            autoAlpha: 1,
-            duration: 0.72,
-            stagger: 0.08,
-          },
-          "-=0.45"
-        )
-        .to(wordmarkRef.current, {
-          scale: 0.88,
-          y: -24,
-          duration: 0.9,
-          ease: "power3.inOut",
-        })
-        .to(
-          introRef.current,
-          {
-            clipPath: "inset(0 0 100% 0)",
-            duration: 1.05,
-            ease: "expo.inOut",
-            pointerEvents: "none",
-          },
-          "-=0.22"
-        )
-        .to(
-          appRef.current,
-          {
-            autoAlpha: 1,
-            duration: 0.55,
-          },
-          "-=0.86"
-        )
-        .from(
-          ".hero-copy > *",
-          {
-            y: 36,
-            autoAlpha: 0,
-            duration: 0.9,
-            stagger: 0.12,
-          },
-          "-=0.48"
-        );
+        .from(".loader-name, .moodboard-tools", { y: 20, autoAlpha: 0, duration: 0.7, stagger: 0.08 }, 0.9)
+        .addPause(2.55)
+        .to(scrollState, {
+          y: window.innerHeight,
+          duration: 0.95,
+          ease: "power4.inOut",
+          onUpdate: () => window.scrollTo(0, scrollState.y),
+        }, 2.55)
+        .from(".header", { y: -14, autoAlpha: 0, duration: 0.45 }, 3.08)
+        .from(".hero-meta", { autoAlpha: 0, duration: 0.45 }, 3.22)
+        .from(".hero-image-wrap", { y: 46, autoAlpha: 0, duration: 0.75 }, 2.92)
+        .from(".hero-word span", { yPercent: 112, autoAlpha: 0, duration: 0.86, stagger: 0.18, ease: "power4.out" }, 3.85)
+        .from(".hero-project-copy", { x: 18, autoAlpha: 0, duration: 0.7 }, 4.65);
+
+      const story = gsap.timeline({ paused: true });
+
+      story
+        .to(".orbit-ring", { rotation: 540, ease: "none", duration: 13.1 }, 0)
+        .to(".orbit-ring", {
+          left: "50%",
+          "--orbit-radius": "60vmin",
+          duration: 1.35,
+          ease: "power2.inOut",
+        }, 1.25)
+        .to(".orbit-stage", { "--orbit-center-y": "78%", duration: 1.35, ease: "power2.inOut" }, 1.25)
+        .to(".orbit-card:not(.orbit-card-extra) img", {
+          scale: 0.9,
+          duration: 1.35,
+          ease: "power2.inOut",
+        }, 1.25)
+        .to(".orbit-card img", { rotation: 0, duration: 1.35, ease: "power2.inOut" }, 1.25)
+        .to(".orbit-stage", { "--orbit-center-y": "22%", duration: 2.8, ease: "none" }, 3)
+        .to(".orbit-ring", {
+          left: "-7%",
+          "--orbit-radius": "60vmin",
+          duration: 1.3,
+          ease: "power2.inOut",
+        }, 6.15)
+        .to(".orbit-stage", { "--orbit-center-y": "50%", duration: 1.3, ease: "power2.inOut" }, 6.15)
+        .to(".orbit-card", {
+          autoAlpha: 1,
+          "--orbit-angle": (index) => `${(360 / orbitSequence.length) * index}deg`,
+          duration: 1.3,
+          ease: "power2.inOut",
+        }, 6.15)
+        .to(".orbit-card img", { scale: 0.96, duration: 1.3, ease: "power2.inOut" }, 6.15)
+        .to(".orbit-intro", { y: -90, autoAlpha: 0, duration: 0.8 }, 1.15)
+        .fromTo(".orbit-founded", { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.65 }, 2.3)
+        .to(".orbit-founded", { autoAlpha: 0, duration: 0.7 }, 5.85);
+
+      gsap.utils.toArray(".orbit-stat").forEach((stat, index) => {
+        const at = 6.35 + index * 1.35;
+        story
+          .fromTo(stat, { y: 80, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.7 }, at)
+          .to(stat, { y: -80, autoAlpha: 0, duration: 0.6 }, at + 0.8);
+      });
+
+      story.fromTo(".orbit-finale", { y: 90, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.9 }, 11.9);
+
+      const orbitSection = document.querySelector(".orbit-story");
+      let displayedProgress = 0;
+      let targetProgress = 0;
+      let orbitFrame = 0;
+
+      const renderOrbitProgress = () => {
+        displayedProgress += (targetProgress - displayedProgress) * 0.16;
+        if (Math.abs(targetProgress - displayedProgress) < 0.0005) displayedProgress = targetProgress;
+        story.progress(displayedProgress);
+        orbitFrame = displayedProgress !== targetProgress
+          ? requestAnimationFrame(renderOrbitProgress)
+          : 0;
+      };
+
+      const updateOrbitScroll = () => {
+        const rect = orbitSection.getBoundingClientRect();
+        const distance = Math.max(1, orbitSection.offsetHeight - window.innerHeight);
+        targetProgress = Math.min(1, Math.max(0, -rect.top / distance));
+        if (!orbitFrame) orbitFrame = requestAnimationFrame(renderOrbitProgress);
+      };
+
+      window.addEventListener("scroll", updateOrbitScroll, { passive: true });
+      window.addEventListener("resize", updateOrbitScroll);
+      updateOrbitScroll();
+
+      const sections = gsap.utils.toArray(".section-reveal");
+      gsap.set(sections, { y: 34, autoAlpha: 0 });
+
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (!entry.isIntersecting) return;
+
+            gsap.to(entry.target, {
+              y: 0,
+              autoAlpha: 1,
+              duration: 0.85,
+              ease: "power3.out",
+            });
+            observer.unobserve(entry.target);
+          });
+        },
+        { threshold: 0.18 }
+      );
+
+      sections.forEach((element) => {
+        observer.observe(element);
+      });
+
+      return () => {
+        observer.disconnect();
+        window.removeEventListener("scroll", updateOrbitScroll);
+        window.removeEventListener("resize", updateOrbitScroll);
+        if (orbitFrame) cancelAnimationFrame(orbitFrame);
+      };
     });
 
-    return () => context.revert();
+    return () => {
+      window.removeEventListener("scroll", syncIntroToScroll);
+      introTimeline.current = null;
+      context.revert();
+    };
   }, []);
 
   return (
-    <>
-      <section className="intro-loader" ref={introRef} aria-label="Studio Ganga opening animation">
-        <div className="intro-wordmark" ref={wordmarkRef} aria-label="Studio Ganga">
-          <span className="intro-word">
-            {"STUDI".split("").map((letter, index) => (
-              <span className="intro-mask" key={`studio-${letter}-${index}`}>
-                <span className="intro-letter">{letter}</span>
-              </span>
-            ))}
-            <span className="intro-circle-wrap">
-              <span className="intro-circle" ref={circleRef} aria-label="O" />
-            </span>
-          </span>
-          <span className="intro-word">
-            {"GANGA".split("").map((letter, index) => (
-              <span className="intro-mask" key={`ganga-${letter}-${index}`}>
-                <span className="intro-letter">{letter}</span>
-              </span>
-            ))}
-          </span>
+    <div className="site" id="home">
+      <div className="intro-scene">
+        <div className="intro-pin">
+      <div className="loader">
+        <div className="loader-stack">
+          <img className="loader-card loader-card-one" src={loaderOne} alt="Studio Ganga project" draggable="false" onPointerDown={beginDrag} />
+          <img className="loader-card loader-card-two" src={loaderTwo} alt="Studio Ganga project" draggable="false" onPointerDown={beginDrag} />
+          <img className="loader-card loader-card-three" src={loaderThree} alt="Studio Ganga project" draggable="false" onPointerDown={beginDrag} />
         </div>
-        <div className="intro-meta" aria-hidden="true">
-          <span>Architecture</span>
-          <span>Interiors</span>
-          <span>Place Making</span>
+        <div className="moodboard-tools">
+          <span>Drag the images anywhere</span>
+          <button type="button" onClick={() => introTimeline.current?.play()}>Enter studio <ArrowUpRight size={17} /></button>
         </div>
-      </section>
-
-      <div className="app-shell" ref={appRef}>
-        <header className={`site-header ${scrolled || menuOpen ? "is-solid" : ""}`}>
-        <a className="brand" href="#top" aria-label="Studio Ganga home" onClick={() => setMenuOpen(false)}>
-          <span className="brand-text">
-            Studi<span className="brand-o" aria-hidden="true" /> Ganga
-          </span>
+        <span className="loader-name">Studio Ganga</span>
+      </div>
+      <header className="header">
+        <a className="brand" href="#home" onClick={() => setMenuOpen(false)}>
+          SG
         </a>
 
         <nav className={`nav ${menuOpen ? "is-open" : ""}`} aria-label="Primary navigation">
           {navItems.map((item) => (
-            <a key={item} href={`#${item.toLowerCase()}`} onClick={() => setMenuOpen(false)}>
+            <a key={item} href={item === "About" ? "#about" : item === "Projects" ? "#work" : "#contact"} onClick={() => setMenuOpen(false)}>
               {item}
             </a>
           ))}
         </nav>
 
-        <a className="header-cta" href="#contact">
-          Enquire <ArrowUpRight size={16} strokeWidth={1.8} />
+        <a className="header-link" href="#contact" aria-label="Start a project">
+          <ArrowUpRight size={28} strokeWidth={1.2} />
         </a>
 
         <button
-          className="menu-toggle"
+          className="menu-button"
           type="button"
           aria-label={menuOpen ? "Close navigation" : "Open navigation"}
           aria-expanded={menuOpen}
-          onClick={() => setMenuOpen((value) => !value)}
+          onClick={() => setMenuOpen((open) => !open)}
         >
           {menuOpen ? <X size={22} /> : <Menu size={22} />}
         </button>
-        </header>
+      </header>
 
-        <main id="top">
-        <section className="hero">
-          <img className="hero-img" src={heroImage} alt="Contemporary architecture with stone, timber, plants, and shaded courtyard light" />
-          <div className="hero-overlay" />
-          <div className="hero-copy">
-            <p className="kicker">Climate-aware architecture and interiors</p>
-            <h1>Architecture that feels composed, lived-in, and deeply rooted.</h1>
-            <div className="hero-lower">
-              <p>
-                Studio Ganga creates residences, studios, and hospitality spaces where proportion, material, light, and everyday ritual do the quiet work.
-              </p>
-              <a className="text-button" href="#work">
-                View work <ArrowRight size={18} />
-              </a>
+      <main>
+        <section className="hero" aria-label="Studio Ganga introduction">
+          <div className="hero-type" aria-label="Sustainable living spaces">
+            <h1 className="hero-word hero-word-one"><span>Sustainable</span></h1>
+            <h1 className="hero-word hero-word-two"><span><em>Living</em><i aria-hidden="true" />Spaces</span></h1>
+          </div>
+
+          <div className="hero-project-copy">
+            <a href="#contact">Talk your plan</a>
+            <div className="hero-note">
+              <img src={loaderOne} alt="" />
+              <p>Creating timeless spaces with minimal environmental impact, transforming the way we live one green space at a time.</p>
             </div>
           </div>
-          <div className="hero-index" aria-label="Studio highlights">
-            <span>01 Context</span>
-            <span>02 Craft</span>
-            <span>03 Climate</span>
+
+          <div className="hero-meta" aria-label="Featured project details">
+            <span>Studio Ganga Residence</span>
+            <span>2026</span>
+            <span>Residential · India</span>
+          </div>
+
+          <div className="hero-image-wrap">
+            <img src={heroImage} alt="Contemporary residence by Studio Ganga" />
           </div>
         </section>
 
-        <section className="statement">
-          <p className="kicker">Point of view</p>
-          <h2>
-            We design the pauses: a cool threshold, a shaded stair, a wall that holds afternoon light, a room that makes ordinary life feel considered.
-          </h2>
+      </main>
+        </div>
+      </div>
+
+      <main>
+        <section className="orbit-story" aria-label="Studio Ganga story and milestones">
+          <div className="orbit-stage">
+            <div className="orbit-ring" aria-hidden="true">
+              {orbitSequence.map((image, index) => (
+                <div
+                  className={`orbit-card ${index >= 15 ? "orbit-card-extra" : ""}`}
+                  key={`${image}-${index}`}
+                  style={{
+                    "--orbit-angle": index < 15
+                      ? `${(360 / 15) * index}deg`
+                      : `${(360 / orbitSequence.length) * index}deg`,
+                  }}
+                >
+                  <img src={image} alt="" />
+                </div>
+              ))}
+            </div>
+
+            <div className="orbit-copy orbit-intro">
+              <p>A studio shaped by clarity, trust, and a collective pursuit of thoughtful design.</p>
+            </div>
+
+            <div className="orbit-copy orbit-founded">
+              <strong>2011</strong>
+              <span>Year of Foundation</span>
+              <small>Built from a belief that enduring architecture begins with listening closely.</small>
+            </div>
+
+            {milestones.map(([number, label]) => (
+              <div className="orbit-copy orbit-stat" key={label}>
+                <strong>{number}</strong>
+                <span>{label}</span>
+              </div>
+            ))}
+
+            <div className="orbit-copy orbit-finale">
+              <span>The spaces behind</span>
+              <strong>ambitious lives.</strong>
+            </div>
+
+            <span className="orbit-scroll-hint">Scroll to explore</span>
+          </div>
+        </section>
+
+        <section className="about section-reveal" id="about">
+          <div className="section-label">
+            <span>About</span>
+          </div>
+          <div className="about-copy">
+            <h2>We design buildings and interiors that feel quiet, rooted, and carefully lived in.</h2>
+            <div className="about-columns">
+              <p>
+                Studio Ganga is an architecture and interiors practice for homes, workspaces, boutique hospitality, and thoughtful renovations. The studio works closely with clients who care about how a place feels across the day, not just how it looks in a photograph.
+              </p>
+              <p>
+                Each project begins by reading the site: light, wind, privacy, material context, budget, and the small rituals that make a space personal. From there, the work becomes simple, clear, and deeply considered.
+              </p>
+            </div>
+          </div>
         </section>
 
         <section className="work" id="work">
-          <div className="section-title">
-            <p className="kicker">Selected work</p>
-            <h2>Recent studies in living, hosting, and making.</h2>
+          <div className="section-heading section-reveal">
+            <span>Work</span>
+            <h2>Selected directions</h2>
           </div>
 
-          <div className="project-list">
-            {projects.map((project, index) => (
-              <article className="project-row" key={project.name}>
-                <div className="project-media">
-                  <img src={project.image} alt={`${project.name} architecture project`} />
-                </div>
-                <div className="project-number">{String(index + 1).padStart(2, "0")}</div>
-                <div className="project-detail">
-                  <span>{project.type}</span>
-                  <h3>{project.name}</h3>
-                  <p>{project.summary}</p>
-                </div>
-                <div className="project-meta">
-                  <span>{project.place}</span>
-                  <span>{project.year}</span>
-                </div>
+          <div className="work-list">
+            {work.map((item) => (
+              <article className="work-item section-reveal" key={item.title}>
+                <a href="#contact" aria-label={`Discuss ${item.title}`}>
+                  <div className="work-image">
+                    <img src={item.image} alt={`${item.title} by Studio Ganga`} />
+                  </div>
+                  <div className="work-content">
+                    <span>{item.number}</span>
+                    <h3>{item.title}</h3>
+                    <p>{item.text}</p>
+                    <strong>
+                      Explore <ArrowUpRight size={18} strokeWidth={1.8} />
+                    </strong>
+                  </div>
+                </a>
               </article>
             ))}
           </div>
         </section>
 
-        <section className="studio" id="studio">
-          <div className="studio-image">
-            <img src={stoneAtelier} alt="Material studio with stone samples, timber joinery, and daylight" />
+        <section className="strength" id="strength">
+          <div className="section-heading section-reveal">
+            <span>Strength</span>
+            <h2>What the studio brings to a project</h2>
           </div>
-          <div className="studio-content">
-            <p className="kicker">Studio</p>
-            <h2>A small practice for clients who want architecture with depth, not decoration.</h2>
-            <p>
-              The studio works through measured drawings, physical samples, climate logic, local craft, and careful site conversations. The result is architecture that feels authored without feeling forced.
-            </p>
-            <div className="studio-badges" aria-label="Studio focus areas">
-              {materialNotes.map((note) => (
-                <span key={note}>{note}</span>
-              ))}
-            </div>
-            <div className="principles">
-              <div>
-                <strong>Material honesty</strong>
-                <span>Stone, lime, timber, metal, concrete, and texture chosen for age, touch, and weather.</span>
-              </div>
-              <div>
-                <strong>Site intelligence</strong>
-                <span>Light, privacy, wind, access, budget, and construction realities enter early.</span>
-              </div>
-            </div>
-          </div>
-        </section>
 
-        <section className="process" id="process">
-          <div className="section-title compact">
-            <p className="kicker">Process</p>
-            <h2>Clear enough for construction. Sensitive enough for place.</h2>
-          </div>
-          <div className="process-grid">
-            {processSteps.map(({ icon: Icon, title, text }, index) => (
-              <article className="process-card" key={title}>
-                <div className="process-card-top">
-                  <Icon size={24} strokeWidth={1.6} />
-                  <span>{String(index + 1).padStart(2, "0")}</span>
+          <div className="strength-grid">
+            {strengths.map(([title, text], index) => (
+              <article className="strength-item section-reveal" key={title}>
+                <span>{index + 1}</span>
+                <div>
+                  <h3>{title}</h3>
+                  <p>{text}</p>
                 </div>
-                <h3>{title}</h3>
-                <p>{text}</p>
-              </article>
-            ))}
-          </div>
-        </section>
-
-        <section className="services" id="services">
-          <div className="section-title compact">
-            <p className="kicker">Services</p>
-            <h2>Everything needed to move from idea to site.</h2>
-          </div>
-          <div className="service-grid">
-            {services.map(({ icon: Icon, title, text }) => (
-              <article className="service" key={title}>
-                <Icon size={28} strokeWidth={1.6} />
-                <h3>{title}</h3>
-                <p>{text}</p>
               </article>
             ))}
           </div>
         </section>
 
         <section className="contact" id="contact">
-          <div className="contact-copy">
-            <p className="kicker">Start a project</p>
-            <h2>Bring the plot, the plan, the problem, or the dream.</h2>
+          <div className="contact-image section-reveal">
+            <img src={courtyardHouse} alt="Courtyard residence with shaded verandah and planting" />
+          </div>
+          <div className="contact-copy section-reveal">
+            <span>Contact</span>
+            <h2>Let us discuss your site, space, or renovation.</h2>
             <p>
-              Share a few lines about the site, scope, timeline, and what the space needs to make possible. The studio will respond with the next practical step.
+              Send a short note about the location, scope, timeline, and what you want the space to become. Studio Ganga will respond with the next practical step.
             </p>
-            <div className="contact-strip">
-              <Sparkles size={18} strokeWidth={1.7} />
-              <span>Ideal for homes, boutique hospitality, workspaces, and thoughtful renovations.</span>
+            <div className="contact-links">
+              <a href="mailto:hello@studioganga.com">
+                <Mail size={18} strokeWidth={1.8} /> hello@studioganga.com
+              </a>
+              <a href="tel:+919999999999">
+                <Phone size={18} strokeWidth={1.8} /> +91 99999 99999
+              </a>
             </div>
           </div>
-          <form className="contact-form" action="mailto:hello@studioganga.in" method="post" encType="text/plain">
-            <label>
-              <span>Name</span>
-              <input name="name" autoComplete="name" required />
-            </label>
-            <label>
-              <span>Email</span>
-              <input name="email" type="email" autoComplete="email" required />
-            </label>
-            <label>
-              <span>Project</span>
-              <select name="project" required defaultValue="">
-                <option value="" disabled>
-                  Select project type
-                </option>
-                <option>New residence</option>
-                <option>Interior design</option>
-                <option>Renovation</option>
-                <option>Commercial space</option>
-              </select>
-            </label>
-            <label>
-              <span>Message</span>
-              <textarea name="message" rows="4" required />
-            </label>
-            <button className="submit-button" type="submit">
-              Send enquiry <ArrowUpRight size={18} />
-            </button>
-          </form>
         </section>
-        </main>
+      </main>
 
-        <footer className="footer">
-          <span>Studio Ganga</span>
-          <span>Architecture and interiors</span>
-          <a href="mailto:hello@studioganga.in">hello@studioganga.in</a>
-        </footer>
-      </div>
-    </>
+      <footer className="footer">
+        <span>© 2026 Studio Ganga</span>
+        <span>Architecture, interiors, and renovation</span>
+      </footer>
+    </div>
   );
 }
 
