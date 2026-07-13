@@ -8,11 +8,15 @@ import heroImage from "../assets/WhatsApp Image 2026-07-07 at 4.27.49 PM (3).jpe
 import loaderOne from "../assets/WhatsApp Image 2026-07-07 at 4.27.48 PM.jpeg";
 import loaderTwo from "../assets/WhatsApp Image 2026-07-07 at 4.27.49 PM (1).jpeg";
 import loaderThree from "../assets/WhatsApp Image 2026-07-07 at 4.27.50 PM.jpeg";
+import isoRoomOne from "../assets3/bedroom-office-transparent-enhanced.png";
+import isoRoomTwo from "../assets3/blue-bedroom-transparent-enhanced.png";
+import isoRoomThree from "../assets3/home-office-transparent-enhanced.png";
 
 const orbitImages = Object.values(
   import.meta.glob("../assets2/*.jpg", { eager: true, query: "?url", import: "default" })
 );
 const orbitSequence = [...orbitImages, ...orbitImages.slice(0, 6)];
+const isoRooms = [isoRoomOne, isoRoomTwo, isoRoomThree];
 
 const milestones = [
   ["15+", "Years of experience"],
@@ -102,6 +106,39 @@ function App() {
     syncIntroToScroll();
 
     const context = gsap.context(() => {
+      const roomSlides = gsap.utils.toArray(".iso-room");
+      gsap.set(roomSlides, { autoAlpha: 0, scale: 0.88, y: 22, transformOrigin: "50% 75%" });
+      gsap.set(roomSlides[0], { autoAlpha: 1, scale: 1, y: 0 });
+
+      gsap.from(".iso-kicker, .iso-title-line, .iso-copy, .iso-actions, .iso-feature", {
+        y: 24,
+        autoAlpha: 0,
+        duration: 0.8,
+        stagger: 0.07,
+        ease: "power3.out",
+      });
+
+      const roomLoop = gsap.timeline({ repeat: -1 });
+
+      roomLoop
+        .to({}, { duration: 1.8 });
+
+      for (let index = 1; index < roomSlides.length; index += 1) {
+        roomLoop
+          .to(roomSlides[index - 1], { autoAlpha: 0, scale: 0.86, y: -18, duration: 0.65, ease: "power2.inOut" })
+          .fromTo(roomSlides[index],
+            { autoAlpha: 0, scale: 1.12, y: 28 },
+            { autoAlpha: 1, scale: 1, y: 0, duration: 0.85, ease: "power3.out" },
+            "-=0.25"
+          )
+          .to({}, { duration: 1.7 });
+      }
+
+      roomLoop
+        .to(roomSlides[roomSlides.length - 1], { autoAlpha: 0, scale: 0.86, duration: 0.65 })
+        .fromTo(roomSlides[0], { autoAlpha: 0, scale: 1.12, y: 26 }, { autoAlpha: 1, scale: 1, y: 0, duration: 0.85, ease: "power3.out" }, "-=0.25")
+        .to({}, { duration: 1.5 });
+
       const intro = gsap.timeline({
         defaults: { ease: "power3.inOut" },
       });
@@ -137,44 +174,52 @@ function App() {
         .to(".orbit-ring", { rotation: 540, ease: "none", duration: 13.1 }, 0)
         .to(".orbit-ring", {
           left: "50%",
-          "--orbit-radius": "60vmin",
-          duration: 1.35,
-          ease: "power2.inOut",
-        }, 1.25)
-        .to(".orbit-stage", { "--orbit-center-y": "78%", duration: 1.35, ease: "power2.inOut" }, 1.25)
+          "--orbit-radius": "68vmin",
+          duration: 1.3,
+          ease: "power3.inOut",
+        }, 1.5)
+        .to(".orbit-stage", { "--orbit-center-y": "86%", duration: 1.3, ease: "power3.inOut" }, 1.5)
+        .to(".orbit-card:not(.orbit-card-extra)", {
+          "--orbit-card-scale": 1,
+          duration: 1.3,
+          ease: "power3.inOut",
+        }, 1.5)
+        .to(".orbit-card:not(.orbit-card-extra)", {
+          "--orbit-angle": (_, card) => card.style.getPropertyValue("--orbit-next-angle"),
+          duration: 1.3,
+          ease: "power3.inOut",
+        }, 1.5)
+        .to(".orbit-card-extra", { autoAlpha: 0, duration: 0.65, ease: "power2.inOut" }, 1.5)
         .to(".orbit-card:not(.orbit-card-extra) img", {
-          scale: 0.9,
-          duration: 1.35,
+          scale: 1.02,
+          duration: 1.3,
           ease: "power2.inOut",
-        }, 1.25)
-        .to(".orbit-card img", { rotation: 0, duration: 1.35, ease: "power2.inOut" }, 1.25)
-        .to(".orbit-stage", { "--orbit-center-y": "22%", duration: 2.8, ease: "none" }, 3)
+        }, 1.5)
+        .to(".orbit-card img", { rotation: 0, duration: 1.3, ease: "power2.inOut" }, 1.5)
+        .to(".orbit-stage", { "--orbit-center-y": "14%", duration: 2.8, ease: "none" }, 2.85)
         .to(".orbit-ring", {
           left: "-7%",
-          "--orbit-radius": "60vmin",
+          "--orbit-radius": "70vmin",
           duration: 1.3,
           ease: "power2.inOut",
         }, 6.15)
-        .to(".orbit-stage", { "--orbit-center-y": "50%", duration: 1.3, ease: "power2.inOut" }, 6.15)
-        .to(".orbit-card", {
-          autoAlpha: 1,
-          "--orbit-angle": (index) => `${(360 / orbitSequence.length) * index}deg`,
-          duration: 1.3,
-          ease: "power2.inOut",
-        }, 6.15)
-        .to(".orbit-card img", { scale: 0.96, duration: 1.3, ease: "power2.inOut" }, 6.15)
-        .to(".orbit-intro", { y: -90, autoAlpha: 0, duration: 0.8 }, 1.15)
-        .fromTo(".orbit-founded", { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.65 }, 2.3)
-        .to(".orbit-founded", { autoAlpha: 0, duration: 0.7 }, 5.85);
+        .to(".orbit-stage", { "--orbit-center-y": "85%", duration: 1.3, ease: "power2.inOut" }, 6.15)
+        .to(".orbit-card:not(.orbit-card-extra) img", { scale: 1.1, duration: 1.3, ease: "power2.inOut" }, 6.15)
+        .to(".orbit-stage", { "--orbit-center-y": "15%", duration: 5.35, ease: "none" }, 7.45)
+        .to(".orbit-intro", { y: -90, autoAlpha: 0, duration: 0.8 }, 1.2)
+        .fromTo(".orbit-founded", { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.65 }, 2.75)
+        .to(".orbit-founded", { autoAlpha: 0, duration: 0.7 }, 5.85)
+        .set(".orbit-rail-item", { opacity: 0.14 }, 0)
+        .set(".orbit-stats-rail", { autoAlpha: 0, y: 0 }, 0)
+        .to(".orbit-stats-rail", { autoAlpha: 1, duration: 0.45 }, 7.15)
+        .to(".orbit-stats-rail", { y: "-248vh", duration: 4.6, ease: "none" }, 7.35);
 
-      gsap.utils.toArray(".orbit-stat").forEach((stat, index) => {
-        const at = 6.35 + index * 1.35;
+      gsap.utils.toArray(".orbit-rail-item").forEach((stat, index) => {
+        const at = 7.35 + index * 1.15;
         story
-          .fromTo(stat, { y: 80, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.7 }, at)
-          .to(stat, { y: -80, autoAlpha: 0, duration: 0.6 }, at + 0.8);
+          .to(stat, { opacity: 1, duration: 0.28, ease: "power2.out" }, at)
+          .to(stat, { opacity: 0.14, duration: 0.34, ease: "power2.in" }, at + 0.82);
       });
-
-      story.fromTo(".orbit-finale", { y: 90, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.9 }, 11.9);
 
       const orbitSection = document.querySelector(".orbit-story");
       let displayedProgress = 0;
@@ -242,6 +287,59 @@ function App() {
 
   return (
     <div className="site" id="home">
+      <section className="iso-hero" aria-label="Studio Ganga modern interior design">
+        <div className="iso-hero-pin">
+        <nav className="iso-nav" aria-label="Hero navigation">
+          <a className="iso-brand" href="#home">Studio Ganga</a>
+          <div>
+            <a href="#about">About us</a>
+            <a href="#work">Portfolio</a>
+            <a href="#contact">Contact</a>
+          </div>
+          <a className="iso-nav-cta" href="#contact">Create your space</a>
+        </nav>
+
+        <div className="iso-heading">
+          <p className="iso-kicker">Architecture · Interiors · Renovation</p>
+          <h1>
+            <span className="iso-title-line">Studio Ganga</span>
+            <em className="iso-title-line">Thoughtful living</em>
+          </h1>
+        </div>
+
+        <div className="iso-room-stage">
+          {isoRooms.map((room, index) => (
+            <img
+              className={`iso-room iso-room-${index + 1}`}
+              src={room}
+              alt={index === 0 ? "Isometric bedroom and home office designed by Studio Ganga" : ""}
+              key={room}
+            />
+          ))}
+        </div>
+
+        <div className="iso-content">
+          <p className="iso-copy">We shape calm, contemporary spaces around the way you live—balancing light, material, proportion and craft.</p>
+          <div className="iso-actions">
+            <a className="iso-start-button" href="#contact">
+              <span className="iso-start-label">Start today</span>
+              <span className="iso-start-icon" aria-hidden="true">
+                <ArrowUpRight size={22} strokeWidth={2} />
+              </span>
+            </a>
+          </div>
+        </div>
+
+        <div className="iso-feature">
+          <span>✦</span>
+          <p>From first sketch<br />to final detail</p>
+        </div>
+
+        </div>
+      </section>
+
+      <div className="hero-orbit-spacer" aria-hidden="true" />
+
       <div className="intro-scene">
         <div className="intro-pin">
       <div className="loader">
@@ -323,7 +421,8 @@ function App() {
                   className={`orbit-card ${index >= 15 ? "orbit-card-extra" : ""}`}
                   key={`${image}-${index}`}
                   style={{
-                    "--orbit-angle": index < 15
+                    "--orbit-angle": `${(360 / orbitSequence.length) * index}deg`,
+                    "--orbit-next-angle": index < 15
                       ? `${(360 / 15) * index}deg`
                       : `${(360 / orbitSequence.length) * index}deg`,
                   }}
@@ -343,16 +442,18 @@ function App() {
               <small>Built from a belief that enduring architecture begins with listening closely.</small>
             </div>
 
-            {milestones.map(([number, label]) => (
-              <div className="orbit-copy orbit-stat" key={label}>
-                <strong>{number}</strong>
-                <span>{label}</span>
-              </div>
-            ))}
+            <div className="orbit-stats-rail">
+              {milestones.map(([number, label]) => (
+                <div className="orbit-rail-item orbit-stat" key={label}>
+                  <strong>{number}</strong>
+                  <span>{label}</span>
+                </div>
+              ))}
 
-            <div className="orbit-copy orbit-finale">
-              <span>The spaces behind</span>
-              <strong>ambitious lives.</strong>
+              <div className="orbit-rail-item orbit-finale">
+                <span>The spaces behind</span>
+                <strong>ambitious lives.</strong>
+              </div>
             </div>
 
             <span className="orbit-scroll-hint">Scroll to explore</span>
